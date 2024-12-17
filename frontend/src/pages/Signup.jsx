@@ -23,7 +23,7 @@ export default function Signup() {
         toast.success("Sign up successfully");
       }
     } catch (error) {
-      toast.error(error.message);
+      toast.error(error.response.data.message);
       setIsLoading(false);
     }
   };
@@ -60,7 +60,7 @@ export default function Signup() {
         </button>
       </form>
       <div className="flex gap-2 mt-5">
-        <span>Have'nt an account?</span>
+        <span>Already have an account?</span>
         <Link to={"/sign-in"} className="text-blue-500 hover:underline">
           Sign in
         </Link>
