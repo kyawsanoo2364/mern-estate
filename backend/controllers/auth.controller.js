@@ -53,3 +53,51 @@ export const SignIn = async (req, res) => {
     res.status(500).json({ message: error.message || "Internal Server Error" });
   }
 };
+
+export const GoogleAuth = async (req, res) => {
+  try {
+    const { email, avatar, username } = req.body;
+    const user = await User.findOne({ email });
+    if (user) {
+      const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET, {
+        expiresIn: "24h",
+      });
+      const { password: pass, ...rest } = user._doc;
+      res
+        .status(200)
+        .cookie("access_token", token, {
+          expires: new Date(Date.now() + 24 * 60 * 60 * 1000),
+        })
+        .json(rest);
+      return;
+    } else {
+      const password =
+        Math.random().toString(36).slice(-8) +
+        Math.random().toString(36).slice(-8);
+      const hashedPwd = bcryptjs.hashSync(password, 10);
+      const newUser = new User({
+        email,
+
+        username:
+          username.split(" ").join("") + Math.random().toString(36).slice(-4),
+        avatar,
+        password: hashedPwd,
+      });
+      await newUser.save();
+      const token = jwt.sign({ id: newUser._id }, process.env.JWT_SECRET, {
+        expiresIn: "24h",
+      });
+      const { password: pass, ...rest } = newUser._doc;
+      res
+        .status(200)
+        .cookie("access_token", token, {
+          expires: new Date(Date.now() + 24 * 60 * 60 * 1000),
+        })
+        .json(rest);
+      return;
+    }
+  } catch (error) {
+    console.log(error);
+    res.status(500).json({ message: error.message });
+  }
+};

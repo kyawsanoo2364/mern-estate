@@ -2,16 +2,17 @@ import { useReducer, useState } from "react";
 import toast from "react-hot-toast";
 import { Link, useNavigate } from "react-router-dom";
 import axios from "axios";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import {
   signInFailure,
   signInStart,
   signInSucces,
 } from "../redux/user/userSlice";
+import OAuth from "../components/OAuth";
 
 export default function Signin() {
   const [formData, setFormData] = useState({});
-  const { isLoading } = useReducer((state) => state.user);
+  const { isLoading } = useSelector((state) => state.user);
   const naviagte = useNavigate();
   const dispatch = useDispatch();
 
@@ -59,6 +60,7 @@ export default function Signin() {
         >
           {isLoading ? "Loading..." : "Sign In"}
         </button>
+        <OAuth />
       </form>
       <div className="flex gap-2 mt-5">
         <span>Haven't an account?</span>
