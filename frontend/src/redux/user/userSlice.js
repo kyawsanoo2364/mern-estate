@@ -12,10 +12,12 @@ const userSlice = createSlice({
   reducers: {
     signInStart: (state) => {
       state.isLoading = true;
+      state.error = null;
     },
     signInSucces: (state, action) => {
       state.isLoading = false;
       state.currentUser = action.payload;
+      state.error = null;
     },
     signInFailure: (state, action) => {
       state.isLoading = false;
