@@ -4,6 +4,8 @@ import dotenv from "dotenv";
 import userRouter from "./routes/user.routes.js";
 import authRouter from "./routes/auth.route.js";
 import cors from "cors";
+import cookieParser from "cookie-parser";
+import bodyParser from "body-parser";
 
 dotenv.config();
 
@@ -15,8 +17,10 @@ mongoose
   .catch((err) => console.log(err));
 
 //middleware
+app.use(bodyParser.urlencoded({ extended: true }));
 app.use(express.json());
 app.use(cors({ origin: "http://localhost:5173", credentials: true }));
+app.use(cookieParser());
 
 //routers
 app.use("/api/user", userRouter);
