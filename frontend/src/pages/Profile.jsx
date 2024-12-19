@@ -3,6 +3,8 @@ import { useDispatch, useSelector } from "react-redux";
 import { toast } from "react-hot-toast";
 import axios from "axios";
 import {
+  deleteUserFailure,
+  deleteUserSuccess,
   updateUserFailure,
   updateUserStart,
   updateUserSuccess,
@@ -36,7 +38,6 @@ export default function Profile() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-
     try {
       dispatch(updateUserStart());
       const formData = new FormData();
@@ -69,6 +70,19 @@ export default function Profile() {
     } catch (error) {
       toast.error(error.response.data.message);
       dispatch(updateUserFailure(error.response.data.message));
+    }
+  };
+
+  const handleDelete = async () => {
+    try {
+      const res = await axios.delete(`/user/delete/${currentUser._id}`);
+      if (res) {
+        dispatch(deleteUserSuccess());
+        toast.success(res.data.message);
+      }
+    } catch (error) {
+      toast.error(error.response.data.message);
+      dispatch(deleteUserFailure(error.response.data.message));
     }
   };
 
@@ -121,8 +135,10 @@ export default function Profile() {
         </button>
       </form>
       <div className="mt-4 flex justify-between ">
-        <span className="text-red-500">Delete account</span>
-        <span className="text-red-500 capitalize">Sign out</span>
+        <span className="text-red-500 cursor-pointer" onClick={handleDelete}>
+          Delete account
+        </span>
+        <span className="text-red-500 capitalize cursor-pointer">Sign out</span>
       </div>
     </div>
   );

@@ -60,3 +60,19 @@ export const updateUser = async (req, res) => {
     res.status(500).json({ message: error.message });
   }
 };
+
+export const deleteUser = async (req, res) => {
+  try {
+    if (req.params.id !== req.user.id) {
+      return res
+        .status(401)
+        .json({ message: "You can only delete your own account!" });
+    }
+    await User.findByIdAndDelete(req.params.id);
+    res.clearCookie("access_token");
+    res.status(200).json({ message: "Deleted successfully" });
+  } catch (error) {
+    console.log(error);
+    res.status(500).json(error.message);
+  }
+};
