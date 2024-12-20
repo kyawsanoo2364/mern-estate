@@ -11,6 +11,8 @@ export const testUserApi = async (req, res) => {
   }
 };
 
+const cloudinary_user_profile_foldername = "mern-estate-user-profile";
+
 export const updateUser = async (req, res) => {
   try {
     if (req.params.id !== req.user.id) {
@@ -31,7 +33,7 @@ export const updateUser = async (req, res) => {
         {
           public_id: user.email,
           resource_type: "image",
-          folder: "mern-estate-user-profile",
+          folder: cloudinary_user_profile_foldername,
           overwrite: true,
           unique_filename: true,
         }
@@ -68,6 +70,10 @@ export const deleteUser = async (req, res) => {
         .status(401)
         .json({ message: "You can only delete your own account!" });
     }
+    const user = await User.findById(req.params.id);
+    await cloudinary.uploader.destroy(
+      cloudinary_user_profile_foldername + "/" + user.email
+    );
     await User.findByIdAndDelete(req.params.id);
     res.clearCookie("access_token");
     res.status(200).json({ message: "Deleted successfully" });

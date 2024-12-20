@@ -6,6 +6,7 @@ import authRouter from "./routes/auth.route.js";
 import cors from "cors";
 import cookieParser from "cookie-parser";
 import bodyParser from "body-parser";
+import listingRouter from "./routes/listing.route.js";
 
 dotenv.config();
 
@@ -25,6 +26,7 @@ app.use(cookieParser());
 //routers
 app.use("/api/user", userRouter);
 app.use("/api/auth", authRouter);
+app.use("/api/listing", listingRouter);
 
 app.use((err, req, res, next) => {
   const statusCode = err.statusCode || 500;

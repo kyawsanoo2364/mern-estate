@@ -4,11 +4,16 @@ import { toast } from "react-hot-toast";
 import axios from "axios";
 import {
   deleteUserFailure,
+  deleteUserStart,
   deleteUserSuccess,
+  signOutUserFailure,
+  signOutUserStart,
+  signOutUserSuccess,
   updateUserFailure,
   updateUserStart,
   updateUserSuccess,
 } from "../redux/user/userSlice";
+import { Link } from "react-router-dom";
 
 export default function Profile() {
   const { currentUser, isLoading } = useSelector((state) => state.user);
@@ -75,6 +80,7 @@ export default function Profile() {
 
   const handleDelete = async () => {
     try {
+      dispatch(deleteUserStart());
       const res = await axios.delete(`/user/delete/${currentUser._id}`);
       if (res) {
         dispatch(deleteUserSuccess());
@@ -83,6 +89,20 @@ export default function Profile() {
     } catch (error) {
       toast.error(error.response.data.message);
       dispatch(deleteUserFailure(error.response.data.message));
+    }
+  };
+
+  const handleSignOut = async () => {
+    try {
+      dispatch(signOutUserStart());
+      const res = await axios.get("/auth/signout");
+      if (res) {
+        dispatch(signOutUserSuccess());
+        toast.success("Sign Out Successfully");
+      }
+    } catch (error) {
+      dispatch(signOutUserFailure(error.response.data.message));
+      toast.error(error.response.data.message);
     }
   };
 
@@ -131,14 +151,25 @@ export default function Profile() {
           className="p-3 uppercase bg-slate-700 text-white rounded-lg hover:opacity-95 disabled:opacity-80"
           disabled={isLoading}
         >
-          {isLoading ? "Uploading..." : "Upload"}
+          {isLoading ? "Loading..." : "Upload"}
         </button>
+        <Link
+          to={"/create-listing"}
+          className="bg-green-700 text-white p-3 text-center  rounded-lg uppercase hover:opacity-95"
+        >
+          Create Listing
+        </Link>
       </form>
       <div className="mt-4 flex justify-between ">
         <span className="text-red-500 cursor-pointer" onClick={handleDelete}>
           Delete account
         </span>
-        <span className="text-red-500 capitalize cursor-pointer">Sign out</span>
+        <span
+          className="text-red-500 capitalize cursor-pointer"
+          onClick={handleSignOut}
+        >
+          Sign out
+        </span>
       </div>
     </div>
   );
