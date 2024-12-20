@@ -35,3 +35,18 @@ export const createListing = async (req, res) => {
     res.status(500).json(error.message);
   }
 };
+
+export const getUserListings = async (req, res) => {
+  try {
+    if (req.params.id !== req.user.id) {
+      return res.status(401).json({
+        message: "Unauthorized! You can only manage your own listings!",
+      });
+    }
+    const listings = await Listing.find({ userRef: req.params.id });
+    res.status(200).json(listings);
+  } catch (error) {
+    console.log(error);
+    res.status(500).json(error.message || "Internal Server Error");
+  }
+};
