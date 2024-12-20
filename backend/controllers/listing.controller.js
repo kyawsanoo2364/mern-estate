@@ -72,3 +72,26 @@ export const deleteListing = async (req, res) => {
     res.status(500).json(error.message || "Internal Server Error");
   }
 };
+
+export const updateListing = async (req, res) => {
+  try {
+    const listing = await Listing.findById(req.params.id);
+    if (!listing) {
+      return res.status(404).json("Listing not found");
+    }
+    if (listing.userRef !== req.user.id) {
+      return res
+        .status(401)
+        .json("Unauthorized! You can only update your own listings!");
+    }
+    const updatedListing = await Listing.findByIdAndUpdate(
+      req.params.id,
+      req.body,
+      { new: true }
+    );
+    res.status(200).json(updatedListing);
+  } catch (error) {
+    console.log(error);
+    res.status(500).json(error.message || "Internal Server Error");
+  }
+};
