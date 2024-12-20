@@ -103,7 +103,7 @@ const CreateListing = () => {
       });
       if (res) {
         toast.success("Created Listing Successfully");
-        navigate(`/listing/${res.data.userRef}`);
+        navigate(`/listing/${res.data._id}`);
         setIsLoading(false);
       }
     } catch (error) {

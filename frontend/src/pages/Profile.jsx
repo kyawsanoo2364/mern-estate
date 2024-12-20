@@ -2,6 +2,9 @@ import { useRef, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { toast } from "react-hot-toast";
 import axios from "axios";
+import { FiEdit } from "react-icons/fi";
+import { FaTrash } from "react-icons/fa";
+
 import {
   deleteUserFailure,
   deleteUserStart,
@@ -22,6 +25,7 @@ export default function Profile() {
   const [previewFile, setPreviewFile] = useState(null);
   const [form, setForm] = useState({});
   const dispatch = useDispatch();
+  const [userListings, setUserListings] = useState([]);
 
   const handleChangeUploadImage = (e) => {
     const fileData = e.target.files[0];
@@ -106,6 +110,29 @@ export default function Profile() {
     }
   };
 
+  const handleShowListings = async () => {
+    try {
+      const res = await axios.get(`/user/listings/${currentUser._id}`);
+      if (res) {
+        setUserListings(res.data);
+      }
+    } catch (error) {
+      toast.error(error?.response?.data.message || error.message);
+    }
+  };
+
+  const handleListingDelete = async (id) => {
+    try {
+      const res = await axios.delete(`/listing/delete/${id}`);
+      if (res) {
+        toast.success(res.data);
+        setUserListings((prev) => prev.filter((listing) => listing._id !== id));
+      }
+    } catch (e) {
+      toast.error(e?.response?.data.message || e.message);
+    }
+  };
+
   return (
     <div className="p-3 max-w-lg mx-auto">
       <h1 className="text-3xl font-semibold text-center">Profile</h1>
@@ -171,6 +198,49 @@ export default function Profile() {
           Sign out
         </span>
       </div>
+      <div className="flex justify-center items-center">
+        <button
+          className="text-green-500 text-center mx-auto my-5"
+          onClick={handleShowListings}
+        >
+          Show Listings
+        </button>
+      </div>
+      {userListings && userListings.length > 0 && (
+        <div>
+          {userListings.map((listing) => (
+            <div
+              key={listing._id}
+              className="flex justify-between gap-4 p-3 border rounded-lg items-center"
+            >
+              <Link to={`/listing/${listing._id}`}>
+                <img
+                  className="size-16 rounded-lg object-cover"
+                  src={listing.imageUrls[0].url}
+                />
+              </Link>
+
+              <Link
+                to={`/listing/${listing._id}`}
+                className="font-semibold truncate flex-1"
+              >
+                {listing.name}
+              </Link>
+              <div className="flex flex-row gap-2 items-center">
+                <button>
+                  <FiEdit className="size-4 text-green-600" />
+                </button>
+                <button
+                  className="text-red-700"
+                  onClick={() => handleListingDelete(listing._id)}
+                >
+                  <FaTrash className="size-4" />
+                </button>
+              </div>
+            </div>
+          ))}
+        </div>
+      )}
     </div>
   );
 }

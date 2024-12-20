@@ -50,3 +50,25 @@ export const getUserListings = async (req, res) => {
     res.status(500).json(error.message || "Internal Server Error");
   }
 };
+
+export const deleteListing = async (req, res) => {
+  try {
+    const listing = await Listing.findById(req.params.id);
+    if (!listing) {
+      return res.status(404).json("Listing not found");
+    }
+    if (listing.userRef !== req.user.id) {
+      return res
+        .status(401)
+        .json("Unauthorized! You can only delete your own listings!");
+    }
+    for (let i = 0; i < listing.imageUrls.length; i++) {
+      await cloudinary.uploader.destroy(listing.imageUrls[i].public_id);
+    }
+    await Listing.findByIdAndDelete(req.params.id);
+    res.status(200).json("Listing deleted successfully");
+  } catch (error) {
+    console.log(error);
+    res.status(500).json(error.message || "Internal Server Error");
+  }
+};
