@@ -1,6 +1,7 @@
 import express from "express";
 import {
   deleteUser,
+  getUser,
   testUserApi,
   updateUser,
 } from "../controllers/user.controller.js";
@@ -14,5 +15,6 @@ router.get("/test", testUserApi);
 router.post("/update/:id", upload.single("imageFile"), VerifyToken, updateUser);
 router.delete("/delete/:id", VerifyToken, deleteUser);
 router.get("/listings/:id", VerifyToken, getUserListings);
+router.get("/:id", VerifyToken, getUser);
 
 export default router;
