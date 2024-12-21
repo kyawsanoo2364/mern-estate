@@ -19,7 +19,7 @@ export const createListing = async (req, res) => {
         {
           folder: "mern-estate-listing",
           overwrite: true,
-          public_id: `${req.body.name}-${i}`,
+          // public_id: `${req.body.name}-${i}`,
         }
       );
       imagesArray.push({ public_id, url: secure_url });
@@ -76,20 +76,63 @@ export const deleteListing = async (req, res) => {
 export const updateListing = async (req, res) => {
   try {
     const listing = await Listing.findById(req.params.id);
+    const newImages = [];
     if (!listing) {
       return res.status(404).json("Listing not found");
     }
+
     if (listing.userRef !== req.user.id) {
       return res
         .status(401)
         .json("Unauthorized! You can only update your own listings!");
     }
+    req.body.imageUrls = JSON.parse(req.body.imageUrls);
+    const deleteForImages = listing.imageUrls.filter((image) =>
+      req.body.imageUrls.every(
+        (newImage) => newImage.public_id !== image.public_id
+      )
+    );
+
+    for (let i = 0; i < deleteForImages.length; i++) {
+      await cloudinary.uploader.destroy(deleteForImages[i].public_id);
+    }
+
+    //console.log(req.body.imageUrls);
+
+    if (req.files && req.files.length > 0) {
+      for (let i = 0; i < req.files.length; i++) {
+        const { public_id, secure_url } = await cloudinary.uploader.upload(
+          req.files[i].path,
+          {
+            folder: "mern-estate-listing",
+            overwrite: true,
+          }
+        );
+        newImages.push({ public_id, url: secure_url });
+      }
+    }
     const updatedListing = await Listing.findByIdAndUpdate(
       req.params.id,
-      req.body,
+      {
+        ...req.body,
+        imageUrls: [...req.body.imageUrls, ...newImages],
+      },
       { new: true }
     );
     res.status(200).json(updatedListing);
+  } catch (error) {
+    console.log(error);
+    res.status(500).json(error.message || "Internal Server Error");
+  }
+};
+
+export const getListingWithId = async (req, res) => {
+  try {
+    const listing = await Listing.findById(req.params.id);
+    if (!listing) {
+      return res.status(404).json("Listing not found");
+    }
+    res.status(200).json(listing);
   } catch (error) {
     console.log(error);
     res.status(500).json(error.message || "Internal Server Error");

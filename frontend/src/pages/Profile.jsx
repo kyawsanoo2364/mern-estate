@@ -227,9 +227,11 @@ export default function Profile() {
                 {listing.name}
               </Link>
               <div className="flex flex-row gap-2 items-center">
-                <button>
-                  <FiEdit className="size-4 text-green-600" />
-                </button>
+                <Link to={`/update-listing/${listing._id}`}>
+                  <button>
+                    <FiEdit className="size-4 text-green-600" />
+                  </button>
+                </Link>
                 <button
                   className="text-red-700"
                   onClick={() => handleListingDelete(listing._id)}
