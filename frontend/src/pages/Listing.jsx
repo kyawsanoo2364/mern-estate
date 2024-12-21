@@ -68,7 +68,7 @@ const Listing = () => {
                   <img
                     src={image.url}
                     alt={image.url}
-                    className="w-full h-[550px] object-cover"
+                    className="w-full h-[550px] object-contain"
                   />
                 </SwiperSlide>
               ))}
