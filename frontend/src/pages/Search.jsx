@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { toast } from "react-hot-toast";
 import axios from "axios";
+import ListingItem from "../components/ListingItem";
 
 function Search() {
   const [sidebarData, setSidebarData] = useState({
@@ -15,6 +16,7 @@ function Search() {
   });
   const [listings, setListings] = useState([]);
   const navigate = useNavigate();
+  const [isLoading, setIsLoading] = useState(true);
 
   const handleChange = (e) => {
     if (
@@ -81,13 +83,16 @@ function Search() {
     });
     const fetchData = async () => {
       try {
+        setIsLoading(true);
         const res = await axios.get(`/listing/get?${urlParams.toString()}`);
         if (res) {
           setListings(res.data);
+          setIsLoading(false);
         }
       } catch (error) {
         console.log(error);
         toast.error("Something went wrong");
+        setIsLoading(false);
       }
     };
     fetchData();
@@ -201,10 +206,27 @@ function Search() {
           </button>
         </form>
       </div>
-      <div>
+      <div className="flex-1 p-4 ">
         <h1 className="text-3xl font-semibold border-b p-3 text-slate-700">
           Listing Results:
         </h1>
+        <div className="my-5 flex flex-wrap gap-4">
+          {!isLoading && listings.length === 0 && (
+            <p className="text-xl text-center p-5 text-slate-700">
+              No Listings Found
+            </p>
+          )}
+          {isLoading && (
+            <p className="text-xl text-center p-5 text-slate-700 w-full">
+              Loading...
+            </p>
+          )}
+          {!isLoading &&
+            listings &&
+            listings.map((listing) => (
+              <ListingItem key={listing._id} listing={listing} />
+            ))}
+        </div>
       </div>
     </div>
   );
