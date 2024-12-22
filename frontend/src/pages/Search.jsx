@@ -14,6 +14,7 @@ function Search() {
     sort: "createdAt",
     order: "desc",
   });
+  const [showMoreButton, setShowMoreButton] = useState(false);
   const [listings, setListings] = useState([]);
   const navigate = useNavigate();
   const [isLoading, setIsLoading] = useState(true);
@@ -70,6 +71,26 @@ function Search() {
     navigate(`/search?${searchURL}`);
   };
 
+  const onShowMoreClick = async () => {
+    const startIndex = listings.length;
+    try {
+      const urlParams = new URLSearchParams(location.search);
+      urlParams.set("startIndex", startIndex);
+      const res = await axios.get(`/listing/get?${urlParams.toString()}`);
+      if (res) {
+        setListings([...listings, ...res.data]);
+        if (res.data.length > 8) {
+          setShowMoreButton(true);
+        } else {
+          setShowMoreButton(false);
+        }
+      }
+    } catch (error) {
+      console.log(error);
+      toast.error("Something went wrong");
+    }
+  };
+
   useEffect(() => {
     const urlParams = new URLSearchParams(location.search);
     setSidebarData({
@@ -88,6 +109,9 @@ function Search() {
         if (res) {
           setListings(res.data);
           setIsLoading(false);
+          if (res.data.length > 8) {
+            setShowMoreButton(true);
+          }
         }
       } catch (error) {
         console.log(error);
@@ -227,6 +251,16 @@ function Search() {
               <ListingItem key={listing._id} listing={listing} />
             ))}
         </div>
+        {showMoreButton && (
+          <div className="flex mt-4 items-center justify-center">
+            <button
+              className="text-green-700 underline"
+              onClick={onShowMoreClick}
+            >
+              Show More
+            </button>
+          </div>
+        )}
       </div>
     </div>
   );
