@@ -8,7 +8,7 @@ import "swiper/swiper-bundle.css";
 import ListingItem from "../components/ListingItem";
 
 export default function Home() {
-  const [recentOfferListing, setRecentOfferListings] = useState([]);
+  const [recentOfferListing, setRecentOfferListings] = useState(null);
   const [recentSaleListing, setRecentSaleListings] = useState([]);
   const [recentRentListing, setRecentRentListings] = useState([]);
   SwiperCore.use([Navigation]);
@@ -17,10 +17,9 @@ export default function Home() {
     const fetchOfferListings = async () => {
       try {
         const res = await axios.get(`/listing/get?offer=true&limit=4`);
-        if (res) {
-          setRecentOfferListings(res.data);
-          fetchRentListings();
-        }
+
+        setRecentOfferListings(res.data);
+        fetchRentListings();
       } catch (error) {
         console.log(error);
       }
@@ -49,7 +48,7 @@ export default function Home() {
   }, []);
 
   return (
-    <div>
+    <div className="p-4">
       {/** top */}
       <div className="flex flex-col gap-6 p-28 px-3 max-w-6xl mx-auto">
         <h1 className="text-slate-700 font-bold text-3xl lg:text-6xl ">
@@ -75,9 +74,10 @@ export default function Home() {
       {/** swiper */}
       <Swiper navigation>
         {recentOfferListing &&
+          Array.isArray(recentOfferListing) &&
           recentOfferListing.length > 0 &&
-          recentOfferListing.map((listing) => (
-            <SwiperSlide>
+          recentOfferListing?.map((listing) => (
+            <SwiperSlide key={listing._id}>
               <div
                 className="h-[500px]  w-full"
                 style={{
@@ -90,7 +90,7 @@ export default function Home() {
       </Swiper>
 
       {/** listing results  */}
-      {recentOfferListing && recentOfferListing.length > 0 && (
+      {recentOfferListing && recentOfferListing?.length > 0 && (
         <div className="max-w-6xl mx-auto my-4">
           <div className="my-3">
             <h2 className="font-semibold text-2xl text-slate-600">
@@ -104,13 +104,13 @@ export default function Home() {
             </Link>
           </div>
           <div className="flex gap-4 flex-wrap">
-            {recentOfferListing.map((listing, i) => (
+            {recentOfferListing?.map((listing, i) => (
               <ListingItem key={listing._id} listing={listing} />
             ))}
           </div>
         </div>
       )}
-      {recentRentListing && recentRentListing.length > 0 && (
+      {recentRentListing && recentRentListing?.length > 0 && (
         <div className="max-w-6xl mx-auto my-4">
           <div className="my-3">
             <h2 className="font-semibold text-2xl text-slate-600">
@@ -124,13 +124,13 @@ export default function Home() {
             </Link>
           </div>
           <div className="flex gap-4 flex-wrap">
-            {recentRentListing.map((listing, i) => (
+            {recentRentListing?.map((listing, i) => (
               <ListingItem key={listing._id} listing={listing} />
             ))}
           </div>
         </div>
       )}
-      {recentSaleListing && recentSaleListing.length > 0 && (
+      {recentSaleListing && recentSaleListing?.length > 0 && (
         <div className="max-w-6xl mx-auto my-4">
           <div className="my-3">
             <h2 className="font-semibold text-2xl text-slate-600">
@@ -144,7 +144,7 @@ export default function Home() {
             </Link>
           </div>
           <div className="flex gap-4 flex-wrap">
-            {recentSaleListing.map((listing, i) => (
+            {recentSaleListing?.map((listing, i) => (
               <ListingItem key={listing._id} listing={listing} />
             ))}
           </div>
